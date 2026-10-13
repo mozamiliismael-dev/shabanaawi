@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#087f5b">
+<title>شبعاناوي</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f2f6f4;color:#202820}
+header{background:#087f5b;color:white;padding:24px 16px;text-align:center}
+header h1{margin:0 0 8px;font-size:30px}
+header p{margin:0}
+nav{display:flex;justify-content:space-around;background:white;padding:12px 4px;position:sticky;top:0;box-shadow:0 2px 8px #0001}
+nav button{border:0;background:none;font-size:15px;padding:8px;color:#087f5b}
+main{max-width:650px;margin:auto;padding:16px}
+.card{background:white;border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 2px 8px #0001}
+h2{color:#087f5b;font-size:21px}
+input,textarea{width:100%;padding:12px;border:1px solid #ccd5cf;border-radius:9px;font-size:16px;margin:6px 0}
+button.primary{background:#087f5b;color:white;border:0;border-radius:9px;padding:12px 18px;font-size:16px;cursor:pointer}
+.post{border-top:1px solid #eee;padding:12px 0;overflow-wrap:anywhere}
+small{color:#777}
+footer{text-align:center;padding:20px;color:#777}
+</style>
+</head>
+<body>
+<header>
+<h1>🌿 شبعاناوي</h1>
+<p>مجتمعنا يجمعنا — شارك أفكارك وتواصل مع الآخرين</p>
+</header>
+
+<nav>
+<button onclick="showSection('home')">الرئيسية</button>
+<button onclick="showSection('publish')">✍️ نشر</button>
+<button onclick="showSection('about')">عن التطبيق</button>
+</nav>
+
+<main>
+<section id="home">
+<div class="card">
+<h2>أهلاً بك في شبعاناوي 👋</h2>
+<p>مساحة اجتماعية لمشاركة الأفكار والمنشورات مع مجتمعك.</p>
+</div>
+<div class="card">
+<h2>📰 أحدث المنشورات</h2>
+<div id="posts"></div>
+</div>
+</section>
+
+<section id="publish" style="display:none">
+<div class="card">
+<h2>✍️ اكتب منشوراً</h2>
+<input id="author" maxlength="40" placeholder="اسمك (اختياري)">
+<textarea id="message" rows="5" maxlength="2000" placeholder="ماذا تريد أن تشارك؟"></textarea>
+<button class="primary" onclick="publishPost()">نشر المنشور</button>
+<p id="status" role="status"></p>
+</div>
+</section>
+
+<section id="about" style="display:none">
+<div class="card">
+<h2>عن شبعاناوي</h2>
+<p>شبعاناوي مشروع تطبيق اجتماعي عربي بسيط، قابل للتطوير وإضافة ميزات جديدة.</p>
+<p>هذه النسخة التجريبية تحفظ المنشورات على الجهاز نفسه.</p>
+</div>
+</section>
+</main>
+
+<footer>شبعاناوي © 2026</footer>
+
+<script>
+function showSection(id){
+['home','publish','about'].forEach(function(s){
+document.getElementById(s).style.display=s===id?'block':'none';
+});
+window.scrollTo(0,0);
+}
+function getPosts(){
+try{return JSON.parse(localStorage.getItem('shabanaoui_posts')||'[]')}
+catch(e){return []}
+}
+function renderPosts(){
+var container=document.getElementById('posts');
+container.textContent='';
+var posts=getPosts();
+if(!posts.length){
+container.textContent='لا توجد منشورات بعد. كن أول من يشارك!';
+return;
+}
+posts.forEach(function(post){
+var article=document.createElement('article');
+article.className='post';
+var name=document.createElement('strong');
+name.textContent=post.author||'مستخدم شبعاناوي';
+var date=document.createElement('small');
+date.textContent=' · '+post.date;
+var content=document.createElement('p');
+content.textContent=post.message;
+article.append(name,date,content);
+container.appendChild(article);
+});
+}
+function publishPost(){
+var author=document.getElementById('author').value.trim();
+var message=document.getElementById('message').value.trim();
+var status=document.getElementById('status');
+if(!message){status.textContent='اكتب محتوى المنشور أولاً.';return}
+try{
+var posts=getPosts();
+posts.unshift({
+author:author||'مستخدم شبعاناوي',
+message:message,
+date:new Date().toLocaleString('ar')
+});
+localStorage.setItem('shabanaoui_posts',JSON.stringify(posts));
+document.getElementById('message').value='';
+status.textContent='تم نشر المنشور على هذا الجهاز.';
+renderPosts();
+showSection('home');
+}catch(e){
+status.textContent='تعذر الحفظ. تحقق من مساحة التخزين في المتصفح.';
+}
+}
+renderPosts();
+</script>
+</body>
+</html>
